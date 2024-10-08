@@ -62,9 +62,9 @@ exports.uploaddata= async(req, res) => {
   // Convert the sheet to JSON
   const data = xlsx.utils.sheet_to_json(sheet);
   // const camelCaseData = convertKeysToCamelCase(data);
-  console.log(camelCaseData[0])
+  // console.log(camelCaseData[0])
   // Insert the data into MongoDB
-  Data.insertMany(camelCaseData)
+  Data.insertMany(data)
   .then( async() => {
       const uniqueUpc = data
       .map(item => item.upc) // Extract only the URLs
