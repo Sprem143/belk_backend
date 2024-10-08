@@ -15,7 +15,12 @@ puppeteer.use(StealthPlugin()); // Use stealth mode
 const app = express();
 const port = 10000;
 
-app.use(cors());
+app.use(cors({
+    origin: true,
+    methods: ["POST", "PUT", "DELETE", "GET"],
+    credentials: true
+  }));
+  
 app.use(express.json());
 app.use('/', router);
 // -------get old price from db
