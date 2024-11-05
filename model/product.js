@@ -1,9 +1,10 @@
 const mongoose= require('mongoose')
 
 const dataSchema = new mongoose.Schema({
-    title:String,
-    url:String,
-    price:Number,
+    amazonTitle:String,
+    vendorURL:String,
+    productCost:Number,
+    colorSize:String,
     upc:{unique:true,
         type:String},
     available:String

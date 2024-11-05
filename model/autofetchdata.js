@@ -5,9 +5,13 @@ const autofetchdataSchema = new mongoose.Schema({
     quantity:Number,
     imgurl:String,
     upc:String,
+    clrsize:String,
     oldPrice:Number,
     newPrice:Number,
-    available:String
+    available:String,
+    offer:String,
+    onsale:String,
+    offerend:String
 });
 
 module.exports= mongoose.model('AutoFetchData', autofetchdataSchema);

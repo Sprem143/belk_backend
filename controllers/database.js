@@ -3,10 +3,10 @@ const xlsx = require('xlsx');
 const path = require('path');
 const Upc= require('../model/upc');
 const Url= require('../model/url');
+const VisitedUrl= require('../model/visitedurl')
 const AutoFetchData= require('../model/autofetchdata')
 const fs = require('fs');
 const product = require('../model/product');
-
 
 exports.getdbproduct= async (req,res)=>{
   try{
@@ -61,10 +61,9 @@ exports.uploaddata= async(req, res) => {
 
   // Convert the sheet to JSON
   const data = xlsx.utils.sheet_to_json(sheet);
-  // const camelCaseData = convertKeysToCamelCase(data);
-  // console.log(camelCaseData[0])
-  // Insert the data into MongoDB
-  Data.insertMany(data)
+  const camelCaseData = convertKeysToCamelCase(data);
+  
+  Data.insertMany(camelCaseData)
   .then( async() => {
       const uniqueUpc = data
       .map(item => item.upc) // Extract only the URLs
@@ -74,11 +73,13 @@ exports.uploaddata= async(req, res) => {
   })
       .then( async() => {
           const uniqueUrls = data
-          .map(item => item.url) // Extract only the URLs
+          .map(item => item['Vendor URL']) 
           .filter((url, index, self) => self.indexOf(url) === index);
           var urls= new Url({url:uniqueUrls});
+          var visitedurl= new VisitedUrl({url:uniqueUrls});
           await urls.save();
-          res.status(200).json({msg:'Data successfully uploaded'})
+          await visitedurl.save();
+          res.status(200).json({msg:'Data successfully uploaded'});
       })
       .catch(err => {
           console.error('Error saving data to MongoDB:', err);
