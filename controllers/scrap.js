@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer-extra');
 const Url= require('../model/url');
 const VisitedUrl= require('../model/visitedurl')
 // const Upc = require('../model/upc');
-const Data = require('../model/product');
+const Product = require('../model/product');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
 const AutoFetchData= require('../model/autofetchdata')
@@ -28,7 +28,7 @@ exports.fetchurl = async (req, res) => {
             return typeof utag_data !== 'undefined' ? utag_data : null;
         });
      console.log(utagData)
-     let datas = await Data.find({ vendorURL: url });
+     let datas = await Product.find({ vendorURL: url });
 
         const price = utagData.sku_price;
         const offer= utagData.product_promotedCoupon[0];
@@ -63,7 +63,7 @@ exports.fetchurl = async (req, res) => {
 exports.checkurl = async (req, res) => {
     try {
         const url = req.body.url;
-        let datas = await Data.find({ vendorURL: url });
+        let datas = await Product.find({ vendorURL: url });
         // Launch Puppeteer instance in non-headless mode
         const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
         const page = await browser.newPage();
@@ -125,7 +125,7 @@ exports.autofetchdata= async (req,res)=>{
     try {
 console.log("autofetch")
         const url = req.body.link;
-        let datas = await Data.find({ vendorURL: url });
+        let datas = await Product.find({ vendorURL: url });
         // Launch Puppeteer instance in non-headless mode
         const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
         const page = await browser.newPage();
