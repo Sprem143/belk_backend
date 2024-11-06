@@ -196,9 +196,9 @@ console.log("autofetch")
             res.status(200).send(true);
         }
         
-    } catch (error) {
+    } catch(error) {
         console.error('Error scraping the webpage:', error);
-        res.status(500).send(false);
+        res.status(500).send(error);
     }
 }
 
