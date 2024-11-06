@@ -6,7 +6,6 @@ const Url= require('../model/url');
 const VisitedUrl= require('../model/visitedurl')
 const AutoFetchData= require('../model/autofetchdata')
 const fs = require('fs');
-const Product = require('../model/product');
 
 exports.getdbproduct= async (req,res)=>{
   try{
