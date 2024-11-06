@@ -1,4 +1,4 @@
-const Data= require('../model/product');
+const Product= require('../model/product');
 const xlsx = require('xlsx');
 const path = require('path');
 const Upc= require('../model/upc');
@@ -10,7 +10,7 @@ const Product = require('../model/product');
 
 exports.getdbproduct= async (req,res)=>{
   try{
-    let result= await Data.find();
+    let result= await Product.find();
     res.json(result)
   }catch(err){
       console.log(err);
@@ -64,7 +64,7 @@ exports.uploaddata= async(req, res) => {
   const data = xlsx.utils.sheet_to_json(sheet);
   const camelCaseData = convertKeysToCamelCase(data);
   
-  Data.insertMany(camelCaseData)
+  Product.insertMany(camelCaseData)
   .then( async() => {
       const uniqueUpc = data
       .map(item => item.upc) // Extract only the URLs

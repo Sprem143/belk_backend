@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 const cors = require('cors');
 const db = require('./db');
-const Data = require('./model/product');
+const Product = require('./model/product');
 const Url = require('./model/url');
 const Upc = require('./model/upc');
 const router = require('./router');
@@ -61,7 +61,7 @@ app.get('/checkprice', async (req, res) => {
     try {
         // Fetching UPCs from the database
         let upcs = await Upc.find();
-        let datas = await Data.find();  // Fetching old data (to compare prices)
+        let datas = await Product.find();  // Fetching old data (to compare prices)
 
         var upcsarr = upcs[0].upc;  // Extracting the UPC array
 
