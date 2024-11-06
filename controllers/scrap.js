@@ -127,7 +127,7 @@ console.log("autofetch")
         const url = req.body.link;
         let datas = await Product.find({ vendorURL: url });
         // Launch Puppeteer instance in non-headless mode
-        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        const browser = await chromium.launch({ headless: true });
         const page = await browser.newPage();
 
         // Set user agent and additional headers
@@ -135,13 +135,12 @@ console.log("autofetch")
         await page.setExtraHTTPHeaders({
             'Accept-Language': 'en-US,en;q=0.9',
             'Referer': 'https://www.google.com/',
-            // 'Authorization': `Bearer ${apiKey}`
         });
 
 
         await page.goto(url, {
             waitUntil: 'networkidle2',
-            timeout: 360000
+            timeout: 60000
         });
 
         const utagData = await page.evaluate(() => {
