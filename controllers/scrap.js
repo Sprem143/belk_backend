@@ -127,7 +127,7 @@ console.log("autofetch")
         const url = req.body.link;
         let datas = await Product.find({ vendorURL: url });
         // Launch Puppeteer instance in non-headless mode
-        const browser = await puppeteer.launch({ headless: false, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+        const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
         const page = await browser.newPage();
 
         // Set user agent and additional headers
