@@ -53,6 +53,7 @@ exports.uploaddata= async(req, res) => {
   if (!file) {
       return res.status(400).send('No file uploaded.');
   }
+
   // Load the uploaded Excel file
   const workbook = xlsx.readFile(file.path);
   const sheetName = workbook.SheetNames[0];  // Read first sheet
@@ -82,7 +83,7 @@ exports.uploaddata= async(req, res) => {
       })
       .catch(err => {
           console.error('Error saving data to MongoDB:', err);
-          res.status(500).json({msg:err});
+          res.status(500).json({msg:'Error saving data to MongoDB'});
       });
 
 };

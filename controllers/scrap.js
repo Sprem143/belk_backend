@@ -177,7 +177,7 @@ console.log("autofetch")
                     available: data.available,
                     offer:offerprice,
                     onsale: matchedProduct.onsale,
-                    offerend:offerend.split(' ')[0]
+                    offerend:offerend
                 };
             }
             return null;

@@ -7,14 +7,12 @@ const Data = require('./model/product');
 const Url = require('./model/url');
 const Upc = require('./model/upc');
 const router = require('./router');
-const multer= require('multer')
 db();
-const upload = multer({ dest: 'uploads/' });
 puppeteer.use(StealthPlugin()); // Use stealth mode
 
 const app = express();
-const port =process.env.PORT|| 10001;
- 
+const port = process.env.PORT||10000;
+
 app.use(cors());
 app.use(express.json());
 app.use('/', router);
