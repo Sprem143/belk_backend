@@ -5,7 +5,9 @@ const VisitedUrl= require('../model/visitedurl')
 const Product = require('../model/product');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
 puppeteer.use(StealthPlugin());
-const AutoFetchData= require('../model/autofetchdata')
+const AutoFetchData= require('../model/autofetchdata');
+const { chromium } = require('playwright-extra');
+
 exports.fetchurl = async (req, res) => {
     try {
         const url = req.body.url;
@@ -121,13 +123,19 @@ exports.checkurl = async (req, res) => {
 };
 
 
-exports.autofetchdata= async (req,res)=>{
+exports.autofetchdata = async (req, res) => {
+    const url = req.body.link;
+
+    let browser;
     try {
-console.log("autofetch")
-        const url = req.body.link;
+        // Attempt to launch the browser
+        browser = await chromium.launch({ headless: true });
+    } catch (launchError) {
+        return res.status(500).send(launchError);
+    }
+
+    try {
         let datas = await Product.find({ vendorURL: url });
-        // Launch Puppeteer instance in non-headless mode
-        const browser = await chromium.launch({ headless: true });
         const page = await browser.newPage();
 
         // Set user agent and additional headers
@@ -137,10 +145,9 @@ console.log("autofetch")
             'Referer': 'https://www.google.com/',
         });
 
-
         await page.goto(url, {
-            waitUntil: 'networkidle2',
-            timeout: 60000
+            waitUntil: 'networkidle',
+            timeout: 360000
         });
 
         const utagData = await page.evaluate(() => {
@@ -151,53 +158,53 @@ console.log("autofetch")
         const upc = utagData.sku_upc;
         const quantity = utagData.sku_inventory;
         const imgurl = utagData.sku_image_url;
-        const offer= utagData.product_promotedCoupon[0];
-        const onsale= utagData.sku_on_sale;
-      
-        const offerprice = offer.cpnDiscount !== undefined ? offer.cpnDiscount : null
-        const offerend= offer.endDate !== undefined ? offer.endDate: null
-        var urlProduct = upc.map((u, index) => {
-            return { upc: u, price: price[index], quantity: quantity[index], imgurl: imgurl[index],onsale: onsale[index] }
-        })
-        console.log(urlProduct)
-        // -----filter product-----
+        const offer = utagData.product_promotedCoupon[0];
+        const onsale = utagData.sku_on_sale;
+
+        const offerprice = offer?.cpnDiscount || null;
+        const offerend = offer?.endDate || null;
+        const urlProduct = upc.map((u, index) => {
+            return { upc: u, price: price[index], quantity: quantity[index], imgurl: imgurl[index], onsale: onsale[index] };
+        });
+        console.log(urlProduct);
+
+        // ----- Filter products -----
         let filterData = datas.map((data) => {
             const matchedProduct = urlProduct.find((p) => p.upc === data.upc);
             if (matchedProduct) {
-                
                 return {
                     url: data.vendorURL,
                     quantity: matchedProduct.quantity,
                     imgurl: matchedProduct.imgurl,
                     upc: data.upc,
-                    clrsize:data.colorSize,
+                    clrsize: data.colorSize,
                     newPrice: matchedProduct.price,
                     oldPrice: data.productCost,
                     available: data.available,
-                    offer:offerprice,
+                    offer: offerprice,
                     onsale: matchedProduct.onsale,
-                    offerend:offerend
+                    offerend: offerend
                 };
             }
             return null;
         }).filter(item => item !== null);
-        VisitedUrl.findOneAndDelete({url:url})
-        await browser.close();
 
-
-        // ---save data into database
-        for (const d of filterData) {
-            console.log(d)
-            const autofetchdata = new AutoFetchData(d);
-         var r=await autofetchdata.save();
-        }
-        if(r){
-            res.status(200).send(true);
-        }
+        await VisitedUrl.findOneAndDelete({ url: url });
         
-    } catch(error) {
-        console.error('Error scraping the webpage:', error);
-        res.status(500).send(error);
+        // Save data into database
+        for (const d of filterData) {
+            const autofetchdata = new AutoFetchData(d);
+            await autofetchdata.save();
+        }
+
+        res.status(200).send(true);
+    } catch (error) {
+        console.error('Error during autofetch data processing:', error);
+        res.status(500).json({ message: 'Error processing autofetch data' });
+    } finally {
+        if (browser) {
+            await browser.close();
+        }
     }
-}
+};
 
