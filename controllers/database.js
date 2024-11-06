@@ -6,6 +6,9 @@ const Url= require('../model/url');
 const VisitedUrl= require('../model/visitedurl')
 const AutoFetchData= require('../model/autofetchdata')
 const fs = require('fs');
+const product = require('../model/product');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 exports.getdbproduct= async (req,res)=>{
   try{
@@ -20,12 +23,11 @@ exports.getlinks= async(req,res)=>{
   try{
     
     let result=  await Url.find();
-    let totalProduct= await Product.find();
+    let totalProduct= await product.find();
     let notp= totalProduct.length;
     res.status(200).json({links:result,notp:notp})
   }catch(err){
     console.log(err);
-    res.status(500).send(err)
   }
 }
 
